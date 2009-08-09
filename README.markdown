@@ -13,13 +13,11 @@ Now, it has been ported to Cappuccino framework. All you have to do is use ZRChr
 
 ## Usage
 
-<code>
-@import "ZRChromaHashTextField.j"
-var chromaField = [ZRChromaHashTextField textFieldWithStringValue:""
-    placeholder:"ChromaHash-Powered Password TextField" width:600];
-[chromaField sizeToFit];
-[what_ever_the_view addSubview: chromaField];
-</code>
+    @import "ZRChromaHashTextField.j"
+    var chromaField = [ZRChromaHashTextField textFieldWithStringValue:""
+        placeholder:"ChromaHash-Powered Password TextField" width:600];
+    [chromaField sizeToFit];
+    [what_ever_the_view addSubview: chromaField];
 
 It provides the static initializer **textFieldWithStringValue:placeholder:width:** just like the ordinary CPTextField. However, this is the only available static initializer for now.
 
