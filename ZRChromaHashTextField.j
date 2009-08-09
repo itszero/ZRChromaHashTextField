@@ -132,6 +132,7 @@
 	CPString salt;
 	int minimum;
 	CPArray components;
+	CPArray anims;
 }
 
 - (void)initWithFrame:(CPRect)aFrame
@@ -196,6 +197,13 @@
 
 - (void)applyNewColor
 {
+	for (var i=0;i<[anim count];i++)
+	{
+		var anim = [anim objectAtIndex:0];
+		[anim removeObject:anim];
+		[anim stopAnimation];
+	}
+	
 	var md5 = hex_md5(input + ':' + salt);
 	var colors = md5.match(/([\dABCDEF]{6})/ig);
 	
@@ -212,14 +220,20 @@
 		else
 			color = [CPColor colorWithHexString: colors[i]];
 		
-		[self setComponentColor:color forIndex: i];
-		// [[[ZRChromaHashColorAnimation alloc] initWithTarget:self ComponentIndex:i toColor:color] startAnimation];
+		var anim = [[ZRChromaHashColorAnimation alloc] initWithTarget:self ComponentIndex:i toColor:color];
+		[anim startAnimation];
+		[anims addObject: anim];
 	}
 }
 
-- (void)setComponentColor:(CPColor)color forIndex:idx
+- (void)colorOfComponentsAtIndex:(int)idx
 {
-	components[idx] = color;
+	return components[bars - idx - 1];
+}
+
+- (void)setComponentColor:(CPColor)color forIndex:(int)idx
+{
+	components[bars - idx - 1] = color;
 	
 	[self setNeedsDisplay: YES];
 }
@@ -248,10 +262,10 @@
 
 - (void)initWithTarget:(CPObject)aTarget ComponentIndex:(int)aIdx toColor:(CPColor)aColor
 {
-	if (self = [super initWithDuration:0.5 animationCurve:CPAnimationLinear])
+	if (self = [super initWithDuration:0.3 animationCurve:CPAnimationLinear])
 	{
 		targetObj = aTarget;
-		originalColor = [targetObj backgroundColor];
+		originalColor = [targetObj colorOfComponentsAtIndex: aIdx];
 		if (originalColor == nil)
 			originalColor = [CPColor clearColor];
 		toColor = aColor;
@@ -264,7 +278,6 @@
 - (void)setCurrentProgress:(float)aProgress
 {
 	[super setCurrentProgress: aProgress];
-
 	[targetObj setComponentColor: [self currentValue] forIndex: idx];
 }
 
@@ -273,10 +286,10 @@
 	var toComponent = [toColor components];
 	var orgComponent = [originalColor components];
 	var curComponent = [0, 0, 0, 0];
-	
+
 	for(var i=0;i<4;i++)
-		curComponent = (toComponent[i] - orgComponent[i]) * [self currentProgress] + orgComponent[i];
-	
+		curComponent[i] = (toComponent[i] - orgComponent[i]) * [self currentProgress] + orgComponent[i];
+
 	return [[CPColor alloc] _initWithRGBA: curComponent];
 }
 
